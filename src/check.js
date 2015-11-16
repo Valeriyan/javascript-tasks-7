@@ -37,6 +37,7 @@ function addCheckContainsKeys() {
     Object.defineProperty(Object.prototype, 'checkContainsKeys', {
         value: function (keys) {
             var context = this;
+
             if (typeof context !== 'object') {
                 return undefined;
             }
