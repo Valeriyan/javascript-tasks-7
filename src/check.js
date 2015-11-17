@@ -11,6 +11,7 @@ exports.init = function () {
     addCheckHasWordsCount();
 };
 
+
 function getQueryType(query) {
     var types = {
         String: 'string',
