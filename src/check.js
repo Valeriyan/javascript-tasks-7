@@ -42,20 +42,12 @@ function addCheckContainsKeys() {
             if (typeof context !== 'object') {
                 return undefined;
             }
-            for (var contextKey in context) {
-                if (!context.hasOwnProperty(contextKey)) {
-                    continue;
-                }
-                if (keys.some(function (item) {
-                    if (item === contextKey) {
-                        return true;
-                    }
+            keys.forEach(function (item) {
+                if (!context.hasOwnProperty(item)) {
                     return false;
-                })) {
-                    return true;
                 }
-            }
-            return false;
+            });
+            return true;
         }
     });
 }
@@ -112,15 +104,26 @@ function addCheckHasValues() {
             if (typeof context !== 'object') {
                 return undefined;
             }
-            if (Object.keys(context).length !== values.length) {
+            var noDuplicateValues = [];
+
+            values.forEach(function (item) {
+                if (noDuplicateValues.indexOf(item) < 0) {
+                    noDuplicateValues.push(item);
+                }
+            });
+            var noDuplicateContextValues = [];
+
+            Object.keys(context).forEach(function (item) {
+                if (noDuplicateContextValues.indexOf(context[item]) < 0) {
+                    noDuplicateContextValues.push(context[item]);
+                }
+            });
+            if (noDuplicateContextValues.length !== noDuplicateValues.length) {
                 return false;
             }
-            return values.every(function (item) {
-                for (var contextKey in context) {
-                    if (!context.hasOwnProperty(contextKey)) {
-                        continue;
-                    }
-                    if (context[contextKey] === item) {
+            return noDuplicateValues.every(function (item) {
+                for (var i = 0; i < noDuplicateContextValues.length; i++) {
+                    if (item === noDuplicateContextValues[i]) {
                         return true;
                     }
                 }
@@ -147,16 +150,11 @@ function addCheckHasLength() {
     var func = function (length) {
         return this.length === length;
     };
-
     Object.defineProperty(String.prototype, 'checkHasLength', {
-        value: function () {
-            return func.apply(this, [length]);
-        }
+        value: func
     });
     Object.defineProperty(Array.prototype, 'checkHasLength', {
-        value: function (length) {
-            return func.apply(this, [length]);
-        }
+        value: func
     });
 }
 
