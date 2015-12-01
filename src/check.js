@@ -35,114 +35,151 @@ function getKeyType(key) {
 }
 
 function addCheckContainsKeys() {
-    Object.defineProperty(Object.prototype, 'checkContainsKeys', {
-        value: function (keys) {
-            var context = this;
+    var func = function (keys) {
+        var context = this;
 
-            if (typeof context !== 'object') {
-                return undefined;
-            }
-            keys.forEach(function (item) {
-                if (!context.hasOwnProperty(item)) {
-                    return false;
-                }
-            });
-            return true;
+        if (typeof context !== 'object') {
+            return undefined;
         }
+        var hasKeys = keys.every(function (item) {
+            return context.hasOwnProperty(item);
+        });
+
+        return hasKeys;
+    };
+    var types = [String, Number, Boolean, Function];
+
+    types.forEach(function (item) {
+        Object.defineProperty(item.prototype, 'checkContainsKeys', {
+            value: undefined
+        });
+    });
+    Object.defineProperty(Object.prototype, 'checkContainsKeys', {
+        value: func
     });
 }
 
 function addCheckHasKeys() {
-    Object.defineProperty(Object.prototype, 'checkHasKeys', {
-        value: function (keys) {
-            var context = this;
+    var func = function (keys) {
+        var context = this;
 
-            if (typeof context !== 'object') {
-                return undefined;
-            }
-            if (Object.keys(context).length !== keys.length) {
-                return false;
-            }
-            return keys.every(function (item) {
-                return context.hasOwnProperty(item);
-            });
+        if (typeof context !== 'object') {
+            return undefined;
         }
+        if (Object.keys(context).length !== keys.length) {
+            return false;
+        }
+        return keys.every(function (item) {
+            return context.hasOwnProperty(item);
+        });
+    };
+    var types = [String, Number, Boolean, Function];
+
+    types.forEach(function (item) {
+        Object.defineProperty(item.prototype, 'checkHasKeys', {
+            value: undefined
+        });
+    });
+    Object.defineProperty(Object.prototype, 'checkHasKeys', {
+        value: func
     });
 }
 
 function addCheckContainsValues() {
-    Object.defineProperty(Object.prototype, 'checkContainsValues', {
-        value: function (values) {
-           var context = this;
+    var func = function (values) {
+        var context = this;
 
-           if (typeof context !== 'object') {
-               return undefined;
-           }
-           for (var contextKey in context) {
-               if (!context.hasOwnProperty(contextKey)) {
-                   continue;
-               }
-               if (values.some(function (item) {
-                       if (item === context[contextKey]) {
-                           return true;
-                       }
-                       return false;
-                   })) {
-                   return true;
-               }
-           }
-           return false;
-       }
+        if (typeof context !== 'object') {
+            return undefined;
+        }
+        var contextValues = [];
+        for (var contextKey in context) {
+            if (!context.hasOwnProperty(contextKey)) {
+                continue;
+            }
+            contextValues.push(context[contextKey]);
+        }
+        var hasValues = values.every(function (item) {
+            return contextValues.indexOf(item) >= 0;
+        });
+
+        return hasValues;
+    };
+    var types = [String, Number, Boolean, Function];
+
+    types.forEach(function (item) {
+        Object.defineProperty(item.prototype, 'checkContainsValues', {
+            value: undefined
+        });
+    });
+    Object.defineProperty(Object.prototype, 'checkContainsValues', {
+        value: func
     });
 }
 
 function addCheckHasValues() {
-    Object.defineProperty(Object.prototype, 'checkHasValues', {
-        value: function (values) {
-            var context = this;
+    var func = function (values) {
+        var context = this;
 
-            if (typeof context !== 'object') {
-                return undefined;
-            }
-            var noDuplicateValues = [];
-
-            values.forEach(function (item) {
-                if (noDuplicateValues.indexOf(item) < 0) {
-                    noDuplicateValues.push(item);
-                }
-            });
-            var noDuplicateContextValues = [];
-
-            Object.keys(context).forEach(function (item) {
-                if (noDuplicateContextValues.indexOf(context[item]) < 0) {
-                    noDuplicateContextValues.push(context[item]);
-                }
-            });
-            if (noDuplicateContextValues.length !== noDuplicateValues.length) {
-                return false;
-            }
-            return noDuplicateValues.every(function (item) {
-                for (var i = 0; i < noDuplicateContextValues.length; i++) {
-                    if (item === noDuplicateContextValues[i]) {
-                        return true;
-                    }
-                }
-                return false;
-            });
+        if (typeof context !== 'object') {
+            return undefined;
         }
+        var noDuplicateValues = [];
+
+        values.forEach(function (item) {
+            if (noDuplicateValues.indexOf(item) < 0) {
+                noDuplicateValues.push(item);
+            }
+        });
+        var noDuplicateContextValues = [];
+
+        Object.keys(context).forEach(function (item) {
+            if (noDuplicateContextValues.indexOf(context[item]) < 0) {
+                noDuplicateContextValues.push(context[item]);
+            }
+        });
+        if (noDuplicateContextValues.length !== noDuplicateValues.length) {
+            return false;
+        }
+        return noDuplicateValues.every(function (item) {
+            for (var i = 0; i < noDuplicateContextValues.length; i++) {
+                if (item === noDuplicateContextValues[i]) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    };
+    var types = [String, Number, Boolean, Function];
+
+    types.forEach(function (item) {
+        Object.defineProperty(item.prototype, 'checkHasValues', {
+            value: undefined
+        });
+    });
+    Object.defineProperty(Object.prototype, 'checkHasValues', {
+        value: func
     });
 }
 
 function addCheckHasValueType() {
-    Object.defineProperty(Object.prototype, 'checkHasValueType', {
-        value: function (key, type) {
-            var context = this;
+    var func = function (key, type) {
+        var context = this;
 
-            if (typeof context !== 'object') {
-                return undefined;
-            }
-            return getKeyType(context[key]) === getQueryType(type);
+        if (typeof context !== 'object') {
+            return undefined;
         }
+        return getKeyType(context[key]) === getQueryType(type);
+    };
+    var types = [String, Number, Boolean, Function];
+
+    types.forEach(function (item) {
+        Object.defineProperty(item.prototype, 'checkHasValueType', {
+            value: undefined
+        });
+    });
+    Object.defineProperty(Object.prototype, 'checkHasValueType', {
+        value: func
     });
 }
 
